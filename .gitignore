@@ -157,6 +157,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
+act
 
 # vscode
 .vscode/
@@ -168,7 +169,6 @@ uv.lock
 
 # VitePress related files (security concern - keep Markdown docs in repo)
 
-docs/package-lock.json
 docs/node_modules/
 
 # local test files
