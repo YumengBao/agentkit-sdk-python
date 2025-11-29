@@ -3,8 +3,6 @@
 name: Deploy VitePress site to Pages
 
 on:
-  # 在针对 `main` 分支的推送上运行。如果你
-  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
   push:
     branches:
       - main
@@ -16,7 +14,6 @@ on:
   # 允许你从 Actions 选项卡手动运行此工作流程
   workflow_dispatch:
 
-# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -29,7 +26,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # 构建工作
   build:
     runs-on: ubuntu-latest
     steps:
@@ -63,14 +59,13 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/.vitepress/dist # 编译产物路径
-      - name: Check artifact
+          path: docs/.vitepress/dist
+      - name: List artifact contents
         run: |
-          echo "Check artifact"
+          echo "List artifact contents"
           pwd
           ls -al docs/.vitepress/dist
 
-  # 部署工作
   deploy:
     environment:
       name: github-pages
@@ -83,4 +78,10 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          path: docs/.vitepress/dist
+          preview: true
+          path: docs
+      - name: Check deployment status
+        run: |
+          echo "Deployment status: ${{ steps.deployment.outputs.status }}"
+          pwd
+          ls -al
