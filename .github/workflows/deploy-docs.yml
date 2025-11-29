@@ -9,24 +9,16 @@ on:
       - feat/docs
     paths:
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yaml'
+      - '.github/workflows/deploy-docs.yml'
 
   # 允许你从 Actions 选项卡手动运行此工作流程
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列
-# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,9 +30,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: |
@@ -56,30 +45,12 @@ jobs:
           pwd
           npm run docs:build
           
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to feat/deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: docs/.vitepress/dist
-      - name: List artifact contents
-        run: |
-          echo "List artifact contents"
-          pwd
-          ls -al docs/.vitepress/dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Check deployment status
-        run: |
-          echo "Deployment status: ${{ steps.deployment.outputs.status }}"
-          pwd
-          ls -al
+          github_token: ${{ secrets.REPO_TOKEN }}
+          publish_dir: docs/.vitepress/dist
+          publish_branch: feat/deploy
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy docs to feat/deploy'
